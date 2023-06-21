@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.27)
 
-if not(TARGET misc)
+if (NOT TARGET misc)
     include(FetchContent)
 
     project(dummy)

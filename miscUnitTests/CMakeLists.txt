@@ -1,3 +1,12 @@
+include(FetchContent)
+
+FetchContent_Declare(
+    my_testing_tools
+    GIT_REPOSITORY https://github.com/naemnamenmea/my-testing-tools.git
+    GIT_TAG        main
+    )
+FetchContent_MakeAvailable(my_testing_tools)
+
 add_executable(miscUnitTests)
 
 file(GLOB TEST_FILES tests/*.cpp)

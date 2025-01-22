@@ -113,10 +113,14 @@ private:
 
 inline void tProcessDisplayCore::Reset(const char* capt_, data_t min_, data_t max_, data_t step_)
 {
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)
+#endif
 	strcpy(m_caption, capt_);
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
 	m_minValue = m_curValue = min_;
 	m_maxValue = max_;
 	m_step = step_;

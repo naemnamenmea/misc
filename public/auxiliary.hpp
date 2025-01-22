@@ -65,7 +65,7 @@ void ValidateBounds(Number number_to_check, Number min_value, Number max_value) 
 	if (number_to_check < min_value || number_to_check > max_value) {
 		std::stringstream error;
 		error << number_to_check << " is out of [" << min_value << ", " << max_value << "]";
-		throw out_of_range(error.str());
+		throw std::out_of_range(error.str());
 	}
 }
 }

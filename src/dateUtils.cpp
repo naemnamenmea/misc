@@ -20,7 +20,9 @@ int DateHelper::ComputeDiffInDays(const Date& date_from, const Date& date_to) {
 Date DateHelper::AddDaysToDate(const Date& date, const int daysToAdd)
 {
   time_t timeInSec = date.AsTimestamp() + daysToAdd * SECONDS_IN_DAY;
+#ifdef _MSC_VER
 #pragma warning(suppress: 4996)
+#endif
   tm* t = localtime(&timeInSec);
   return Date::CreateDate(t);
 }

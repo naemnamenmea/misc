@@ -18,11 +18,15 @@ ifstream_XML::ifstream_XML(const char* file_name_, bool no_comments_)
 		return;
 	}
 	/*char nocomment_fname[L_tmpnam+5]("tmp.xml");*/
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)
+#endif
 	tmpnam(m_noCommentTmpFileName);
 	strcpy(m_noCommentTmpFileName + strlen(m_noCommentTmpFileName), ".xml");
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
 	ofstream dest_without_comments(m_noCommentTmpFileName);
 	const unsigned short int bufsize(256);
 	char buffer[bufsize] = {};
@@ -33,6 +37,7 @@ ifstream_XML::ifstream_XML(const char* file_name_, bool no_comments_)
 	for (;;)
 	{
 		if (buf_vol < m_commentBegin.size())
+		{
 			if (eof())
 			{
 				dest_without_comments.write(buf_beg, buf_vol);
@@ -46,6 +51,7 @@ ifstream_XML::ifstream_XML(const char* file_name_, bool no_comments_)
 				buf_beg = buffer;
 				buf_end = buf_beg + buf_vol;
 			}
+		}
 
 		if (m_commentBegin.compare(0, m_commentBegin.size(), buf_beg, m_commentBegin.size()) == 0)
 		{
@@ -147,8 +153,10 @@ struct nonzero
 	}
 };
 
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4702)
+#endif
 const char* ifstream_XML::FindWord1stOf(const char** words_, const size_t n_)
 {
 	char* begs = new char[n_ + 1];
@@ -185,11 +193,13 @@ const char* ifstream_XML::FindWord1stOf(const char** words_, const size_t n_)
 	}
 
 	delete[] begs;
-	tMessage msg("No of words: ");
+	KontrolException msg("No of words: ");
 	for (i = 0; i < n_; ++i) msg << '"' << words_[i] << "\" ";
 	throw msg << "- has been found in XML data file";
 }
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
 
 bool ifstream_XML::FindHighLevelTag(const char* tag_)
 {
@@ -246,7 +256,7 @@ void ifstream_XML::ReadObject(tXML_Reader& reader_, const string& tag_)
 	{
 		tag = '<';
 		tag += tag_;
-		Assert(FindWord(tag.c_str()), tMessage("Tag \"") << tag << "\" not found in XML data file");
+		Assert(FindWord(tag.c_str()), KontrolException("Tag \"") << tag << "\" not found in XML data file");
 		tag.erase(0, 1);
 		char ch = static_cast<char>(peek());
 		if (ch == '>')
@@ -255,15 +265,15 @@ void ifstream_XML::ReadObject(tXML_Reader& reader_, const string& tag_)
 			tag += ch;
 		}
 	}
-	Assert(!bad(), tMessage("Possible unexpected end of file before reading object ") << tag_);
+	Assert(!bad(), KontrolException("Possible unexpected end of file before reading object ") << tag_);
 	Assert(
-		tag[0] != '/', tMessage("Finishing tag found \"") << tag << "\" (starting one expected)");
+		tag[0] != '/', KontrolException("Finishing tag found \"") << tag << "\" (starting one expected)");
 
 	if (tag[tag.length() - 1] == '>')
 	{
 		Assert(
 			tag[tag.length() - 2] != '/',
-			tMessage("Object \"") << tag << "\" contains tag only, no data");
+			KontrolException("Object \"") << tag << "\" contains tag only, no data");
 		tag.resize(tag.length() - 1);  // pop_back();
 	}
 	else if (ReadAttribs(reader_) == '/')  //
@@ -272,7 +282,7 @@ void ifstream_XML::ReadObject(tXML_Reader& reader_, const string& tag_)
 		return;
 	}
 	reader_.ReadData(tag, *this);
-	Assert(!fail(), tMessage("Error while reading data for object \"") << tag << '"');
+	Assert(!fail(), KontrolException("Error while reading data for object \"") << tag << '"');
 
 	string next_tag;
 	for (;;)
@@ -282,7 +292,7 @@ void ifstream_XML::ReadObject(tXML_Reader& reader_, const string& tag_)
 		ReadWord(next_tag);
 		Assert(
 			!bad(),
-			tMessage("Possible unexpected end of file while reading next data for \"")
+			KontrolException("Possible unexpected end of file while reading next data for \"")
 				<< tag << '"');
 		if (next_tag[0] == '/')
 			break;
@@ -307,7 +317,7 @@ char ifstream_XML::ReadAttribs(tXML_Reader& reader_)
 		reader_.SetValue(attr_name, value);
 		Assert(
 			!fail(),
-			tMessage("Error while reading attributes. Last attribute = \"")
+			KontrolException("Error while reading attributes. Last attribute = \"")
 				<< attr_name << "\", value = \"" << value << '"');
 		for (;;)
 		{
@@ -324,9 +334,9 @@ char ifstream_XML::ReadAttribs(tXML_Reader& reader_)
 size_t ifstream_XML::CountArray(const char* array_tag_)
 {
 	if (!FindWord(array_tag_))
-		// if (!FindHighLevelTag(array_tag_)) // Почему-то очень долго ищет тег finite_elements для
-		// больших моделей, а при 10000 КЭ программа вылетает
-		throw tMessage("Can't find tag ") << array_tag_;
+		// if (!FindHighLevelTag(array_tag_)) // пїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ finite_elements пїЅпїЅпїЅ
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅ 10000 пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+		throw KontrolException("Can't find tag ") << array_tag_;
 
 	streampos beg_pos = tellg();
 

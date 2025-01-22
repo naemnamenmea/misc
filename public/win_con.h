@@ -10,7 +10,7 @@ class tVisibleUI
 {
 public:
 	tVisibleUI()
-		: m_hCon(GetStdHandle(STD_OUTPUT_HANDLE)), m_beginPos(0), m_buffer(), m_tmp(), m_xy()
+		: m_hCon(GetStdHandle(STD_OUTPUT_HANDLE)), m_beginPos(0), m_tmp(), m_buffer(), m_xy()
 	{
 #ifdef STRONGCHECK
 		Assert(m_hCon != INVALID_HANDLE_VALUE, "Can't get handle");
@@ -19,7 +19,7 @@ public:
 		GetConsoleScreenBufferInfo(m_hCon, &sb_inf);
 		m_endPos = sb_inf.srWindow.Right - sb_inf.srWindow.Left - 5;
 		std::fill_n(const_cast<char*>(m_blank), MAX_SCREEN_WIDTH, ' ');
-		std::fill_n(const_cast<char*>(m_bar), MAX_SCREEN_WIDTH, '°');
+		std::fill_n(const_cast<char*>(m_bar), MAX_SCREEN_WIDTH, '#'); // ï¿½
 	}
 
 	void PrintCaption(__int64 nomer_, const char* capt_, int min_, int max_)
@@ -37,10 +37,14 @@ public:
 
 	void PrintCurrent(__int64 nomer_, int min_, int max_, int val_)
 	{
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)
+#endif
 		const size_t min_len = strlen(itoa(min_, m_buffer, 10));  // std::sprintf(buffer,"%i",min_),
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
 		const size_t current_pos = (val_ - min_) * (m_endPos - m_beginPos) / (max_ - min_);
 		m_xy.X = static_cast<SHORT>(m_beginPos + min_len);
 		m_xy.Y = static_cast<SHORT>(nomer_ * 2 + 1);

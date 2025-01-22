@@ -2,10 +2,19 @@
 
 #include <cstdio>
 #include <string>
+#include <cstring>
 #include <iterator>
 
+#if (defined(__GNUC__) || defined(__GNUG__)) && !defined(__clang__)
+#define GCC_COMPILER 1
+#else
+#define GCC_COMPILER 0
+#endif
+
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)
+#endif
 class ifstream_c
 {
 public:
@@ -118,7 +127,7 @@ public:
 	ifstream_c& operator>>(long int& x_)
 	{
 		if (m_pStream != nullptr)
-			std::fscanf(m_pStream, "%dl", &x_);
+			std::fscanf(m_pStream, "%ld", &x_);
 		return *this;
 	}
 	ifstream_c& operator>>(unsigned int& x_)
@@ -130,7 +139,7 @@ public:
 	ifstream_c& operator>>(unsigned long int& x_)
 	{
 		if (m_pStream != nullptr)
-			std::fscanf(m_pStream, "%ul", &x_);
+			std::fscanf(m_pStream, "%lu", &x_);
 		return *this;
 	}
 	ifstream_c& operator>>(float& x_)
@@ -158,8 +167,14 @@ private:
 	std::FILE* m_pStream;
 	size_t m_lastUnformattedRead;
 };
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
 
+#if GCC_COMPILER
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 template <typename T>
 class ifstream_c_iterator : public std::iterator<std::input_iterator_tag, T>
 {
@@ -198,3 +213,6 @@ private:
 	ifstream_c* m_pStream;
 	T m_value;
 };
+#if GCC_COMPILER
+#pragma GCC diagnostic pop
+#endif

@@ -1,14 +1,15 @@
 #pragma once
 
-#include "ThrowMessage.hpp"
+#include "KontrolException.hpp"
 #include <vector>
 #include <string>
 #include <fstream>
 #include <algorithm>
+#include <cstring>
 
 #if /*!defined __GNUG__  ||*/ defined __MINGW32__ || defined __BORLANDC__
 //#if defined __BORLANDC__ && defined _MSC_VER
-#include "ifstream_c.h"
+#include "ifstream_c.hpp"
 #endif
 
 #ifdef IFSTREAM_C
@@ -180,7 +181,7 @@ inline size_t ifstream_XML::CountItems(const char* end_tag_, const char* item_ta
 	const size_t items_num(WordCountBefore(item_tag_, end_tag_));
 	Assert(
 		!bad(),
-		tMessage("Error while counting items \"")
+		KontrolException("Error while counting items \"")
 			<< item_tag_ << "\" within object \"" << end_tag_ << '"');
 	seekg(beg_pos);
 	return items_num;
